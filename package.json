@@ -1,0 +1,38 @@
+{
+  "name": "create-grandstack-app",
+  "version": "0.0.1",
+  "description": "Create a new GRANDstack application",
+  "bin": "./dist/create-grandstack-app.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "yarn clean && babel src --out-dir dist",
+    "build:watch": "nodemon --ignore dist --exec 'yarn build'",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "yarn clean && yarn build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "William Lyon",
+  "license": "MIT",
+  "dependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.0",
+    "@babel/node": "^7.8.7",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/plugin-transform-runtime": "^7.9.0",
+    "@babel/preset-env": "^7.9.0",
+    "@babel/preset-react": "^7.9.4",
+    "@babel/preset-typescript": "^7.9.0",
+    "@babel/runtime-corejs3": "^7.9.2",
+    "axios": "^0.19.2",
+    "babel-plugin-auto-import": "^1.0.5",
+    "babel-plugin-module-resolver": "^4.0.0",
+    "chalk": "^4.0.0",
+    "check-node-version": "^4.0.3",
+    "decompress": "^4.2.1",
+    "execa": "^4.0.0",
+    "listr": "^0.14.3",
+    "tmp": "^0.1.0"
+  }
+}
