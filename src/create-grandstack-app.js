@@ -14,6 +14,29 @@ import execa from "execa";
 import tmp from "tmp";
 import checkNodeVersion from "check-node-version";
 import chalk from "chalk";
+import { Command } from "commander";
+
+let projectName;
+
+const program = new Command()
+  .arguments("<project-directory>")
+  .action((name) => {
+    projectName = name;
+  })
+  .option("--use-npm")
+
+  .parse(process.argv);
+
+const shouldUseYarn = () => {
+  try {
+    execa.sync("yarnpkg", ["--version"]);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
+const useYarn = program.useNpm ? false : shouldUseYarn();
 
 const RELEASE_URL =
   "https://api.github.com/repos/grand-stack/grand-stack-starter/releases";
@@ -36,7 +59,7 @@ const downloadFile = async (sourceUrl, targetFile) => {
   });
 };
 
-const targetDir = String(process.argv.slice(2)).replace(/,/g, "-");
+const targetDir = projectName.replace(/,/g, "-");
 if (!targetDir) {
   console.error("No project directory specified");
   console.log(
@@ -93,13 +116,12 @@ const createProjectTasks = ({ newAppDir }) => {
 const installNodeModulesTasks = ({ newAppDir }) => {
   return [
     {
-      title: "Checking node and yarn compatibility",
+      title: "Checking compatibility",
       task: () => {
         return new Promise((resolve, reject) => {
           // FIXME: pull this from grand-stack-starter repo
           const engines = {
-            node: ">=12",
-            yarn: ">=1.15",
+            node: ">=8",
           };
 
           checkNodeVersion(engines, (_error, result) => {
@@ -119,7 +141,7 @@ const installNodeModulesTasks = ({ newAppDir }) => {
     {
       title: "Installing dependencies for 'api'",
       task: () => {
-        return execa("yarn install", {
+        return execa(useYarn ? "yarn install" : "npm install", {
           shell: true,
           cwd: path.join(newAppDir, "api"),
         });
@@ -128,7 +150,7 @@ const installNodeModulesTasks = ({ newAppDir }) => {
     {
       title: "Installing dependencies for 'ui-react'",
       task: () => {
-        return execa("yarn install", {
+        return execa(useYarn ? "yarn install" : "npm install", {
           shell: true,
           cwd: path.join(newAppDir, "ui-react"),
         });
