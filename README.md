@@ -16,4 +16,4 @@ or with `npm`:
 npx create-grandstack-app <newappname>
 ```
 
-If `yarn` is detected then packages will be installed with `yarn`, use flag `--use-npm` to force use of `npm`.
+If `yarn` is detected then packages will be installed with `yarn` with fallback to `npm`, use flag `--use-npm` to force use of `npm`.
