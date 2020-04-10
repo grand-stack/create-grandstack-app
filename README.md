@@ -1,5 +1,7 @@
 # create-grandstack-app
 
+![](img/create-grandstack-app.gif)
+
 Create a new GRANDstack application skeleton from the command line.
 
 Usage:
