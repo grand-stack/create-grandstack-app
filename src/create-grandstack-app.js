@@ -123,6 +123,13 @@ const getConfigureAPIAnswers = async ({ newAppDir }) => {
       default: "bolt://localhost:7687",
     },
     {
+      type: "confirm",
+      name: "neo4j_encrypted",
+      message:
+        'Use an encrypted connection for Neo4j? (Select "No" for Neo4j Sandbox)',
+      default: false,
+    },
+    {
       type: "input",
       name: "neo4j_user",
       message: "Enter the Neo4j user",
@@ -140,7 +147,7 @@ const getConfigureAPIAnswers = async ({ newAppDir }) => {
 };
 
 const configureAPI = ({ answers, newAppDir }) => {
-  const { neo4j_uri, neo4j_user, neo4j_password } = answers ;
+  const { neo4j_uri, neo4j_user, neo4j_password, neo4j_encrypted } = answers;
 
   const dotenvpath = path.join(newAppDir, "api");
 
@@ -154,7 +161,7 @@ NEO4J_USER=${neo4j_user}
 NEO4J_PASSWORD=${neo4j_password}
 
 # Uncomment this line to enable encrypted driver connection for Neo4j
-#NEO4J_ENCRYPTED=true
+${neo4j_encrypted ? "" : "#"}NEO4J_ENCRYPTED=true
 
 # Uncomment this line to specify a specific Neo4j database (v4.x+ only)
 #NEO4J_DATABASE=neo4j
@@ -243,15 +250,23 @@ const main = async () => {
       // TODO: Add options for creating a Neo4j instance (Desktop, Sandbox, Aura)
 
       if (!program.yes) {
-        console.log(`Now let's configure your GraphQL API to connect to Neo4j.`);
-        console.log(`If you don't have a Neo4j instance yet you can create a free hosted Neo4j instance in the cloud at: https://neo4j.com/sandbox`)
-        console.log()
+        console.log(
+          `Now let's configure your GraphQL API to connect to Neo4j.`
+        );
+        console.log(
+          `These options will be written to ${targetDir}/api/.env and can be changed there if needed.`
+        );
+        console.log();
+        console.log(
+          `If you don't have a Neo4j instance yet you can create a free hosted Neo4j instance in the cloud at: https://neo4j.com/sandbox`
+        );
+        console.log();
         const answers = await getConfigureAPIAnswers({ newAppDir });
-        configureAPI({answers, newAppDir})
+        configureAPI({ answers, newAppDir });
       }
-
+      console.log();
       console.log(
-        `Thanks for trying out GRANDstack! We've created your app in '${newAppDir}'`
+        `Thanks for using GRANDstack! We've created your app in '${newAppDir}'`
       );
       console.log(`You can find documentation at: https://grandstack.io/docs`);
       console.log();
@@ -259,7 +274,7 @@ const main = async () => {
 
          cd ${targetDir}
          npm run start
-      `)
+      `);
     })
     .catch((e) => {
       console.log();
