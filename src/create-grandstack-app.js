@@ -16,6 +16,7 @@ import checkNodeVersion from "check-node-version";
 import chalk from "chalk";
 import { Command } from "commander";
 import inquirer from "inquirer";
+import rimraf from "rimraf";
 
 let projectName;
 
@@ -110,6 +111,16 @@ const createProjectTasks = ({ newAppDir }) => {
     {
       title: "Extracting latest release",
       task: () => decompress(tmpDownloadPath, newAppDir, { strip: 1 }),
+    },
+    {
+      title: "Removing unused packages based on configuration options",
+      task: () => {
+        return rimraf(path.join(newAppDir, "web-angular"), (err) => {
+          if (err) {
+            console.error(err);
+          }
+        });
+      },
     },
   ];
 };
@@ -219,14 +230,14 @@ const installNodeModulesTasks = ({ newAppDir }) => {
       },
     },
     {
-      title: "Installing dependencies for 'ui-react'",
+      title: "Installing dependencies for 'web-react'",
       task: () => {
         return execa(useYarn ? "yarn install" : "npm install", {
           shell: true,
-          cwd: path.join(newAppDir, "ui-react"),
+          cwd: path.join(newAppDir, "web-react"),
         });
       },
-    },
+    }
   ];
 };
 
@@ -247,7 +258,6 @@ const main = async () => {
     .run()
     .then(async () => {
       console.log();
-      // TODO: Add options for creating a Neo4j instance (Desktop, Sandbox, Aura)
 
       if (!program.yes) {
         console.log(
