@@ -15,6 +15,7 @@ import tmp from "tmp";
 import checkNodeVersion from "check-node-version";
 import chalk from "chalk";
 import { Command } from "commander";
+import inquirer from "inquirer";
 
 let projectName;
 
@@ -24,7 +25,7 @@ const program = new Command()
     projectName = name;
   })
   .option("--use-npm")
-
+  .option("-y, --yes")
   .parse(process.argv);
 
 const shouldUseYarn = () => {
@@ -113,6 +114,60 @@ const createProjectTasks = ({ newAppDir }) => {
   ];
 };
 
+const getConfigureAPIAnswers = async ({ newAppDir }) => {
+  const answers = await inquirer.prompt([
+    {
+      type: "input",
+      name: "neo4j_uri",
+      message: "Enter the connection string for Neo4j",
+      default: "bolt://localhost:7687",
+    },
+    {
+      type: "input",
+      name: "neo4j_user",
+      message: "Enter the Neo4j user",
+      default: "neo4j",
+    },
+    {
+      type: "input",
+      name: "neo4j_password",
+      message: "Enter the password for this user",
+      default: "letmein",
+    },
+  ]);
+
+  return answers;
+};
+
+const configureAPI = ({ answers, newAppDir }) => {
+  const { neo4j_uri, neo4j_user, neo4j_password } = answers ;
+
+  const dotenvpath = path.join(newAppDir, "api");
+
+  // FIXME: It would be better to replace into a template instead of rewrite entire file
+  const dotenvstring = `# Use this file to set environment variables with credentials and configuration options
+# This file is provided as an example and should be replaced with your own values
+# You probably don't want to check this into version control!
+
+NEO4J_URI=${neo4j_uri}
+NEO4J_USER=${neo4j_user}
+NEO4J_PASSWORD=${neo4j_password}
+
+# Uncomment this line to enable encrypted driver connection for Neo4j
+#NEO4J_ENCRYPTED=true
+
+# Uncomment this line to specify a specific Neo4j database (v4.x+ only)
+#NEO4J_DATABASE=neo4j
+
+GRAPHQL_SERVER_HOST=0.0.0.0
+GRAPHQL_SERVER_PORT=4001
+GRAPHQL_SERVER_PATH=/graphql
+  
+`;
+
+  fs.writeFileSync(path.join(dotenvpath, ".env"), dotenvstring);
+};
+
 const installNodeModulesTasks = ({ newAppDir }) => {
   return [
     {
@@ -139,6 +194,15 @@ const installNodeModulesTasks = ({ newAppDir }) => {
       },
     },
     {
+      title: "Installing GRANDstack CLI locally",
+      task: () => {
+        return execa(useYarn ? "yarn install" : "npm install", {
+          shell: true,
+          cwd: path.join(newAppDir),
+        });
+      },
+    },
+    {
       title: "Installing dependencies for 'api'",
       task: () => {
         return execa(useYarn ? "yarn install" : "npm install", {
@@ -159,30 +223,49 @@ const installNodeModulesTasks = ({ newAppDir }) => {
   ];
 };
 
-new Listr(
-  [
-    {
-      title: "Create GRANDstack App",
-      task: () => new Listr(createProjectTasks({ newAppDir })),
-    },
-    {
-      title: "Installing Packages",
-      task: () => new Listr(installNodeModulesTasks({ newAppDir })),
-    },
-  ],
-  { collapse: false, exitOnError: true }
-)
-  .run()
-  .then(() => {
-    console.log();
-    console.log(
-      `Thanks for trying out GRANDstack! We've created your app in '${newAppDir}'`
-    );
-    console.log(`You can find documentation at: https://grandstack.io/docs`);
-    console.log();
-  })
-  .catch((e) => {
-    console.log();
-    console.log(e);
-    process.exit(1);
-  });
+const main = async () => {
+  new Listr(
+    [
+      {
+        title: "Create GRANDstack App",
+        task: () => new Listr(createProjectTasks({ newAppDir })),
+      },
+      {
+        title: "Installing Packages",
+        task: () => new Listr(installNodeModulesTasks({ newAppDir })),
+      },
+    ],
+    { collapse: false, exitOnError: true }
+  )
+    .run()
+    .then(async () => {
+      console.log();
+      // TODO: Add options for creating a Neo4j instance (Desktop, Sandbox, Aura)
+
+      if (!program.yes) {
+        console.log(`Now let's configure your GraphQL API to connect to Neo4j.`);
+        console.log(`If you don't have a Neo4j instance yet you can create a free hosted Neo4j instance in the cloud at: https://neo4j.com/sandbox`)
+        console.log()
+        const answers = await getConfigureAPIAnswers({ newAppDir });
+        configureAPI({answers, newAppDir})
+      }
+
+      console.log(
+        `Thanks for trying out GRANDstack! We've created your app in '${newAppDir}'`
+      );
+      console.log(`You can find documentation at: https://grandstack.io/docs`);
+      console.log();
+      console.log(`To start your GRANDstack app run:
+
+         cd ${targetDir}
+         npm run start
+      `)
+    })
+    .catch((e) => {
+      console.log();
+      console.log(e);
+      process.exit(1);
+    });
+};
+
+main();
