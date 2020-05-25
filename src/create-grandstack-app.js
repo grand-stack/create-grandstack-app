@@ -280,10 +280,15 @@ const main = async () => {
       );
       console.log(`You can find documentation at: https://grandstack.io/docs`);
       console.log();
-      console.log(`To start your GRANDstack app run:
+      console.log(`To start your GRANDstack web application and GraphQL API run:
 
-         cd ${targetDir}
-         npm run start
+        cd ${targetDir}
+        npm run start
+
+Then (optionally) to seed the database with sample data, in another terminal run:
+
+        npm run seedDb
+
       `);
     })
     .catch((e) => {
