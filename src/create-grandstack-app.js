@@ -285,7 +285,7 @@ const main = async () => {
         cd ${targetDir}
         npm run start
 
-Then (optionally) to seed the database with sample data, in another terminal run:
+Then (optionally) to seed the database with sample data, in the api/ directory in another terminal run:
 
         npm run seedDb
 
