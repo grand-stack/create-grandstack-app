@@ -276,9 +276,10 @@ const main = async () => {
       }
       console.log();
       console.log(
-        `Thanks for using GRANDstack! We've created your app in '${newAppDir}'`
+        `Thanks for using GRANDstack! We've created your business reviews dashboard app in '${newAppDir}'.
+         Please adapt the GraphQL schema and the UI components for your own use-cases.`
       );
-      console.log(`You can find documentation at: https://grandstack.io/docs`);
+      console.log(`You can find documentation in the readme and at: https://grandstack.io/docs`);
       console.log();
       console.log(`To start your GRANDstack web application and GraphQL API run:
 
@@ -288,6 +289,10 @@ const main = async () => {
 Then (optionally) to seed the database with sample data, in the api/ directory in another terminal run:
 
         npm run seedDb
+
+To infer an initial GraphQL schema for your existing graph data, you can run
+
+        npm run inferschema:write
 
       `);
     })
