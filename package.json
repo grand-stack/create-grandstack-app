@@ -1,15 +1,10 @@
 {
   "name": "create-grandstack-app",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Create a new GRANDstack application",
-  "main": "src/index.js",
-  "bin": {
-    "@ed42311/create-grandstack-app": "bin/create-project",
-    "create-grandstack-app": "bin/create-project"
-  },
+  "bin": "./dist/create-grandstack-app.js",
   "files": [
-    "bin",
-    "src"
+    "dist"
   ],
   "scripts": {
     "build": "yarn clean && babel src --out-dir dist",
@@ -38,7 +33,6 @@
     "chalk": "^4.1.0",
     "check-node-version": "^4.0.3",
     "decompress": "^4.2.1",
-    "esm": "^3.2.25",
     "execa": "^4.0.3",
     "inquirer": "^7.3.3",
     "listr": "^0.14.3",

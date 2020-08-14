@@ -4,8 +4,9 @@ import Listr from 'listr'
 import path from 'path'
 import { projectInstall } from 'pkg-install'
 import { createProjectTasks, checkAppDir, initGit } from './file'
+import { parseArgumentsIntoOptions, promptForMissingOptions } from './options'
 
-export async function createApp(options) {
+async function createApp(options) {
   const {
     template,
     projectPath,
@@ -20,68 +21,59 @@ export async function createApp(options) {
   } = options
   const creds = { neo4jUri, neo4jEncrypted, neo4jUser, neo4jPassword }
 
-  const checkReact = (templateChoice, useNpm, runInstall, newAppDir) => {
-    const templateName = `web-${templateChoice.toLowerCase()}`
-    const isReactProject = templateName.includes('react')
-    if (isReactProject) {
-      return [
-        {
-          title: `Installing ${templateName} dependencies`,
-          task: () =>
-            projectInstall({
-              cwd: path.join(newAppDir, templateName),
-              prefer: useNpm ? 'npm' : 'yarn',
-            }),
-          skip: () =>
-            !runInstall
-              ? 'Pass --install to automatically install dependencies'
-              : undefined,
-        },
-      ]
-    } else {
-      //  Handle angular?
-      return []
-    }
-  }
-
   // Check to see if path exists and return joined path
   const newAppDir = checkAppDir(projectPath)
+  const templateName = `web-${template.toLowerCase()}`
+  const packageManager = useNpm ? 'npm' : 'yarn'
 
   // Main task loop, build and concat based on options
   console.log('%s', chalk.green.bold('Initializing Project...'))
   const tasks = new Listr(
     [
-      ...createProjectTasks({ newAppDir, rmTemplates, ...creds }),
+      {
+        title: 'Create GRANDstack App',
+        task: () =>
+          new Listr(createProjectTasks({ newAppDir, rmTemplates, ...creds })),
+      },
       {
         title: 'Initialize git',
         task: () => initGit(newAppDir),
         enabled: () => gitInit,
       },
       {
-        title: 'Installing GRANDstack CLI and dependencies',
+        title: `Installing Packages with ${packageManager}`,
         task: () =>
-          projectInstall({
-            cwd: newAppDir,
-            prefer: useNpm ? 'npm' : 'yarn',
-          }),
+          new Listr([
+            {
+              title: 'Installing GRANDstack CLI and dependencies',
+              task: () =>
+                projectInstall({
+                  cwd: newAppDir,
+                  prefer: packageManager,
+                }),
+            },
+            {
+              title: 'Installing api dependencies',
+              task: () =>
+                projectInstall({
+                  cwd: path.join(newAppDir, 'api'),
+                  prefer: packageManager,
+                }),
+            },
+            {
+              title: `Installing ${templateName} dependencies`,
+              task: () =>
+                projectInstall({
+                  cwd: path.join(newAppDir, templateName),
+                  prefer: packageManager,
+                }),
+            },
+          ]),
         skip: () =>
           !runInstall
             ? 'Pass --install to automatically install dependencies'
             : undefined,
       },
-      {
-        title: 'Installing api dependencies',
-        task: () =>
-          projectInstall({
-            cwd: path.join(newAppDir, 'api'),
-            prefer: useNpm ? 'npm' : 'yarn',
-          }),
-        skip: () =>
-          !runInstall
-            ? 'Pass --install to automatically install dependencies'
-            : undefined,
-      },
-      ...checkReact(template, useNpm, runInstall, newAppDir),
     ],
     { collapse: false, exitOnError: true }
   )
@@ -105,4 +97,10 @@ Then (optionally) to seed the database with sample data, in the api/ directory i
         npm run seedDb
 `)
   return true
+}
+
+export const main = async (args) => {
+  const options = parseArgumentsIntoOptions(args)
+  const prompted = await promptForMissingOptions(options)
+  createApp(prompted)
 }

@@ -1,13 +1,21 @@
 import inquirer from 'inquirer'
 import arg from 'arg'
+import chalk from 'chalk'
 
 const templateOpts = ['React', 'React-TS', 'Angular']
 
 const APIQuestions = [
   {
     type: 'input',
+    name: 'whatever',
+    message: chalk.green(
+      `Now let's configure your GraphQL API to connect to Neo4j. Take a minute to create a graph instance.\nAll Set?\n`
+    ),
+  },
+  {
+    type: 'input',
     name: 'neo4jUri',
-    message: 'Enter the connection string for Neo4j',
+    message: 'Alright, Enter the connection string for Neo4j',
     default: 'bolt://localhost:7687',
   },
   {
@@ -64,7 +72,7 @@ export const parseArgumentsIntoOptions = (rawArgs) => {
 }
 
 export const promptForMissingOptions = async (options) => {
-  const { skipPrompts, template, projectPath, gitInit } = options
+  const { skipPrompts, template, projectPath, gitInit, runInstall } = options
 
   const defaultTemplate = 'React'
   const defaultPath = './GRANDStackStarter'
@@ -94,6 +102,15 @@ export const promptForMissingOptions = async (options) => {
     })
   }
 
+  if (!runInstall) {
+    questions.push({
+      type: 'confirm',
+      name: 'runInstall',
+      message: 'Install dependencies in all directories?',
+      default: false,
+    })
+  }
+
   if (!gitInit) {
     questions.push({
       type: 'confirm',
@@ -106,6 +123,7 @@ export const promptForMissingOptions = async (options) => {
   const {
     template: inqTemplate,
     gitInit: inqGitInit,
+    runInstall: inqRunInstall,
     ...rest
   } = await inquirer.prompt([...questions, ...APIQuestions])
   const chosenTemplate = template || inqTemplate
@@ -118,5 +136,6 @@ export const promptForMissingOptions = async (options) => {
     template: chosenTemplate,
     projectPath: projectPath || defaultPath,
     gitInit: gitInit || inqGitInit,
+    runInstall: runInstall || inqRunInstall,
   }
 }
