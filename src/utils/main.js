@@ -2,7 +2,7 @@ import chalk from 'chalk'
 import Listr from 'listr'
 import path from 'path'
 import { projectInstall } from 'pkg-install'
-import { createProjectTasks, checkAppDir, initGit } from './file'
+import { createProjectTasks, checkAppDir, initGit, appDir } from './file'
 import { parseArgumentsIntoOptions, promptForMissingOptions } from './options'
 
 async function createApp(options) {
@@ -21,7 +21,7 @@ async function createApp(options) {
   const creds = { neo4jUri, neo4jEncrypted, neo4jUser, neo4jPassword }
 
   // Check to see if path exists and return joined path
-  const newAppDir = checkAppDir(projectPath)
+  const newAppDir = appDir(projectPath)
   const templateName = `web-${template.toLowerCase()}`
   const packageManager = useNpm ? 'npm' : 'yarn'
 
@@ -32,7 +32,15 @@ async function createApp(options) {
       {
         title: 'Create GRANDstack App',
         task: () =>
-          new Listr(createProjectTasks({ newAppDir, rmTemplates, ...creds })),
+          new Listr(
+            createProjectTasks({
+              newAppDir,
+              rmTemplates,
+              template,
+              templateName,
+              ...creds,
+            })
+          ),
       },
       {
         title: 'Initialize git',
@@ -100,6 +108,7 @@ Then (optionally) to seed the database with sample data, in the api/ directory i
 
 export const main = async (args) => {
   const options = parseArgumentsIntoOptions(args)
+  checkAppDir(options.projectPath)
   const prompted = await promptForMissingOptions(options)
   createApp(prompted)
 }

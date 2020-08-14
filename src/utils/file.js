@@ -10,6 +10,19 @@ import rimraf from 'rimraf'
 const dirExists = (dir) => fs.existsSync(dir)
 const dirIsNotEmpty = (dir) => fs.readdirSync(dir).length > 0
 
+export const checkAppDir = (targetDir) => {
+  const exists = dirExists(targetDir)
+  if (exists && dirIsNotEmpty(targetDir)) {
+    console.log(
+      `%s '${targetDir}' already exists and is not empty.`,
+      chalk.yellow.bold('ALREADYEXISTS')
+    )
+    process.exit(1)
+  }
+}
+
+export const appDir = (targetDir) => path.resolve(process.cwd(), targetDir)
+
 export const initGit = async (newAppDir) => {
   const result = await execa('git', ['init'], {
     cwd: newAppDir,
@@ -18,17 +31,6 @@ export const initGit = async (newAppDir) => {
     return Promise.reject(new Error('Failed to initialize git'))
   }
   return
-}
-
-export const checkAppDir = (targetDir) => {
-  if (dirExists(targetDir) && dirIsNotEmpty(targetDir)) {
-    console.log(
-      `%s '${targetDir}' already exists and is not empty.`,
-      chalk.yellow.bold('ALREADYEXISTS')
-    )
-    process.exit(1)
-  }
-  return path.resolve(process.cwd(), targetDir)
 }
 
 export const writeDotEnv = ({
@@ -62,6 +64,16 @@ GRAPHQL_SERVER_PATH=/graphql
 `
 
   fs.writeFileSync(path.join(dotenvpath, '.env'), dotenvstring)
+}
+
+export const writeConfigJson = ({ newAppDir, template, templateName }) => {
+  const dotenvpath = path.join(newAppDir, 'scripts')
+  const config = {
+    templateName,
+    template,
+  }
+
+  fs.writeFileSync(path.join(dotenvpath, 'index.json'), JSON.stringify(config))
 }
 
 export const latestReleaseZipFile = async () => {
@@ -101,8 +113,13 @@ export const removeUnusedTemplates = async ({ newAppDir, rmTemplates }) => {
   }
 }
 
-export const createProjectTasks = ({ newAppDir, rmTemplates, ...creds }) => {
-  const appDirExists = dirExists(newAppDir)
+export const createProjectTasks = ({
+  newAppDir,
+  rmTemplates,
+  template,
+  templateName,
+  ...creds
+}) => {
   const tmpDownloadPath = tmp.tmpNameSync({
     prefix: 'grandstack',
     postfix: '.zip',
@@ -110,7 +127,9 @@ export const createProjectTasks = ({ newAppDir, rmTemplates, ...creds }) => {
 
   return [
     {
-      title: `${appDirExists ? 'Using' : 'Creating'} directory '${newAppDir}'`,
+      title: `${
+        dirExists(newAppDir) ? 'Using' : 'Creating'
+      } directory '${newAppDir}'`,
       task: () => {
         fs.mkdirSync(newAppDir, { recursive: true })
       },
@@ -133,6 +152,10 @@ export const createProjectTasks = ({ newAppDir, rmTemplates, ...creds }) => {
           newAppDir,
           ...creds,
         }),
+    },
+    {
+      title: 'Creating scripts configuration...',
+      task: () => writeConfigJson({ newAppDir, template, templateName }),
     },
     {
       title: `Removing unused templates: ${rmTemplates.join(' ')} ...`,

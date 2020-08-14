@@ -8,7 +8,7 @@ const APIQuestions = [
     type: 'input',
     name: 'whatever',
     message: chalk.green(
-      `Now let's configure your GraphQL API to connect to Neo4j. Take a minute to create a graph instance.\nAll Set?\n`
+      `Now let's configure your GraphQL API to connect to Neo4j. If you don't have a Neo4j instance you can create one for free in the cloud at https://neo4j.com/sandbox`
     ),
   },
   {
@@ -105,8 +105,8 @@ export const promptForMissingOptions = async (options) => {
     questions.push({
       type: 'confirm',
       name: 'runInstall',
-      message: 'Install dependencies in all directories?',
-      default: false,
+      message: 'Install dependencies?',
+      default: true,
     })
   }
 
