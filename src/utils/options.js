@@ -3,7 +3,6 @@ import arg from 'arg'
 import chalk from 'chalk'
 
 const templateOpts = ['React', 'React-TS', 'Angular']
-
 const APIQuestions = [
   {
     type: 'input',

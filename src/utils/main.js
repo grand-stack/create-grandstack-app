@@ -1,5 +1,4 @@
 import chalk from 'chalk'
-
 import Listr from 'listr'
 import path from 'path'
 import { projectInstall } from 'pkg-install'
