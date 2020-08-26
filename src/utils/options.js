@@ -3,15 +3,20 @@ import arg from 'arg'
 import chalk from 'chalk'
 
 const templateOpts = ['React', 'React-TS', 'Angular', 'Flutter']
+const templateFileNameHashMap = {
+  React: 'web-react',
+  'React-TS': 'web-react-ts',
+  Angular: 'angular',
+  Flutter: 'mobile_client_flutter',
+}
+
+export const getTemplateName = (chosenTemplate) => {
+  return templateFileNameHashMap[chosenTemplate]
+}
 
 const getRmTemplates = (chosenTemplate) => {
-  const templateFileNameHashMap = {
-    React: 'web-react',
-    'React-TS': 'web-react-ts',
-    Angular: 'angular',
-    Flutter: 'client_flutter',
-  }
-  delete templateFileNameHashMap[chosenTemplate]
+  const tempTemplateHash = { ...templateFileNameHashMap }
+  delete tempTemplateHash[chosenTemplate]
   return Object.values(templateFileNameHashMap)
 }
 
