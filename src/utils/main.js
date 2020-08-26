@@ -3,17 +3,14 @@ import Listr from 'listr'
 import path from 'path'
 import { projectInstall } from 'pkg-install'
 import { createProjectTasks, checkAppDir, initGit, appDir } from './file'
-import {
-  parseArgumentsIntoOptions,
-  promptForMissingOptions,
-  getTemplateName,
-} from './options'
+import { parseArgumentsIntoOptions, promptForMissingOptions } from './options'
 
 async function createApp(options) {
   const {
-    template,
     projectPath,
     rmTemplates,
+    templateName,
+    templateFileName,
     gitInit,
     useNpm,
     neo4jUri,
@@ -22,11 +19,11 @@ async function createApp(options) {
     neo4jPassword,
     runInstall,
   } = options
+
   const creds = { neo4jUri, neo4jEncrypted, neo4jUser, neo4jPassword }
 
   // Check to see if path exists and return joined path
   const newAppDir = appDir(projectPath)
-  const templateName = getTemplateName(template)
   const packageManager = useNpm ? 'npm' : 'yarn'
 
   // Main task loop, build and concat based on options
@@ -40,8 +37,8 @@ async function createApp(options) {
             createProjectTasks({
               newAppDir,
               rmTemplates,
-              template,
               templateName,
+              templateFileName,
               ...creds,
             })
           ),

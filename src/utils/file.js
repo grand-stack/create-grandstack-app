@@ -66,14 +66,19 @@ GRAPHQL_SERVER_PATH=/graphql
   fs.writeFileSync(path.join(dotenvpath, '.env'), dotenvstring)
 }
 
-export const writeConfigJson = ({ newAppDir, template, templateName }) => {
-  const dotenvpath = path.join(newAppDir, 'scripts')
+export const writeConfigJson = ({
+  newAppDir,
+  templateName,
+  templateFileName,
+}) => {
+  const configPath = path.join(newAppDir, 'scripts', 'config')
+  fs.mkdirSync(configPath)
   const config = {
-    templateFileName: templateName,
-    template,
+    templateFileName,
+    templateName,
   }
 
-  fs.writeFileSync(path.join(dotenvpath, 'index.json'), JSON.stringify(config))
+  fs.writeFileSync(path.join(configPath, 'index.json'), JSON.stringify(config))
 }
 
 export const latestReleaseZipFile = async () => {
@@ -116,8 +121,8 @@ export const removeUnusedTemplates = async ({ newAppDir, rmTemplates }) => {
 export const createProjectTasks = ({
   newAppDir,
   rmTemplates,
-  template,
   templateName,
+  templateFileName,
   ...creds
 }) => {
   const tmpDownloadPath = tmp.tmpNameSync({
@@ -155,10 +160,12 @@ export const createProjectTasks = ({
     },
     {
       title: 'Creating scripts configuration...',
-      task: () => writeConfigJson({ newAppDir, template, templateName }),
+      task: () =>
+        writeConfigJson({ newAppDir, templateName, templateFileName }),
     },
     {
-      title: `Removing unused templates: ${rmTemplates.join('\n   ')} ...`,
+      title: `Removing unused templates:
+    \u2714 ${rmTemplates.join('\n    \u2714 ')}`,
       task: async () => await removeUnusedTemplates({ newAppDir, rmTemplates }),
     },
   ]
