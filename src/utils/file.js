@@ -69,7 +69,7 @@ GRAPHQL_SERVER_PATH=/graphql
 export const writeConfigJson = ({ newAppDir, template, templateName }) => {
   const dotenvpath = path.join(newAppDir, 'scripts')
   const config = {
-    templateName,
+    templateFileName: templateName,
     template,
   }
 
@@ -158,7 +158,7 @@ export const createProjectTasks = ({
       task: () => writeConfigJson({ newAppDir, template, templateName }),
     },
     {
-      title: `Removing unused templates: ${rmTemplates.join(' ')} ...`,
+      title: `Removing unused templates: ${rmTemplates.join('\n   ')} ...`,
       task: async () => await removeUnusedTemplates({ newAppDir, rmTemplates }),
     },
   ]

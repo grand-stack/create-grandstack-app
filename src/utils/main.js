@@ -3,7 +3,11 @@ import Listr from 'listr'
 import path from 'path'
 import { projectInstall } from 'pkg-install'
 import { createProjectTasks, checkAppDir, initGit, appDir } from './file'
-import { parseArgumentsIntoOptions, promptForMissingOptions } from './options'
+import {
+  parseArgumentsIntoOptions,
+  promptForMissingOptions,
+  getTemplateName,
+} from './options'
 
 async function createApp(options) {
   const {
@@ -22,7 +26,7 @@ async function createApp(options) {
 
   // Check to see if path exists and return joined path
   const newAppDir = appDir(projectPath)
-  const templateName = `web-${template.toLowerCase()}`
+  const templateName = getTemplateName(template)
   const packageManager = useNpm ? 'npm' : 'yarn'
 
   // Main task loop, build and concat based on options
