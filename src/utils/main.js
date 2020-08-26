@@ -69,10 +69,10 @@ async function createApp(options) {
                 }),
             },
             {
-              title: `Installing ${templateName} dependencies`,
+              title: `Installing ${templateFileName} dependencies`,
               task: () =>
                 projectInstall({
-                  cwd: path.join(newAppDir, templateName),
+                  cwd: path.join(newAppDir, templateFileName),
                   prefer: packageManager,
                 }),
             },
