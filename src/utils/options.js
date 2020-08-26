@@ -6,18 +6,18 @@ const templateOpts = ['React', 'React-TS', 'Angular', 'Flutter']
 const templateFileNameHashMap = {
   React: 'web-react',
   'React-TS': 'web-react-ts',
-  Angular: 'angular',
+  Angular: 'web-angular',
   Flutter: 'mobile_client_flutter',
 }
 
-export const getTemplateName = (chosenTemplate) => {
+export const getTemplateFileName = (chosenTemplate) => {
   return templateFileNameHashMap[chosenTemplate]
 }
 
 const getRmTemplates = (chosenTemplate) => {
-  const tempTemplateHash = { ...templateFileNameHashMap }
-  delete tempTemplateHash[chosenTemplate]
-  return Object.values(templateFileNameHashMap)
+  return Object.values(templateFileNameHashMap).filter(
+    (name) => name !== templateFileNameHashMap[chosenTemplate]
+  )
 }
 
 const APIQuestions = [
@@ -102,7 +102,8 @@ export const promptForMissingOptions = async (options) => {
       neo4jUser: 'neo4j',
       neo4jPassword: 'letmein',
       rmTemplates: getRmTemplates(chosenTemplate),
-      template: template || defaultTemplate,
+      templateName: template || defaultTemplate,
+      templateFileName: getTemplateFileName(chosenTemplate),
       projectPath: projectPath || defaultPath,
     }
   }
@@ -147,7 +148,8 @@ export const promptForMissingOptions = async (options) => {
     ...options,
     ...rest,
     rmTemplates: getRmTemplates(chosenTemplate),
-    template: chosenTemplate,
+    templateName: chosenTemplate,
+    templateFileName: getTemplateFileName(chosenTemplate),
     projectPath: projectPath || defaultPath,
     gitInit: gitInit || inqGitInit,
     runInstall: runInstall || inqRunInstall,
