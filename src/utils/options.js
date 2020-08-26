@@ -2,13 +2,27 @@ import inquirer from 'inquirer'
 import arg from 'arg'
 import chalk from 'chalk'
 
-const templateOpts = ['React', 'React-TS', 'Angular']
+const templateOpts = ['React', 'React-TS', 'Angular', 'Flutter']
+
+const getRmTemplates = (chosenTemplate) => {
+  const templateFileNameHashMap = {
+    React: 'web-react',
+    'React-TS': 'web-react-ts',
+    Angular: 'angular',
+    Flutter: 'client_flutter',
+  }
+  delete templateFileNameHashMap[chosenTemplate]
+  return Object.values(templateFileNameHashMap)
+}
+
 const APIQuestions = [
   {
     type: 'input',
     name: 'whatever',
     message: chalk.green(
-      `Now let's configure your GraphQL API to connect to Neo4j. If you don't have a Neo4j instance you can create one for free in the cloud at https://neo4j.com/sandbox`
+      `Now let's configure your GraphQL API to connect to Neo4j. If you don't have a Neo4j instance you can create one for free in the cloud at https://neo4j.com/sandbox
+
+Hit <Return> When you are ready.`
     ),
   },
   {
@@ -82,9 +96,7 @@ export const promptForMissingOptions = async (options) => {
       neo4jEncrypted: false,
       neo4jUser: 'neo4j',
       neo4jPassword: 'letmein',
-      rmTemplates: templateOpts.filter(
-        (c) => c.toLowerCase() !== defaultTemplate.toLowerCase()
-      ),
+      rmTemplates: getRmTemplates(chosenTemplate),
       template: template || defaultTemplate,
       projectPath: projectPath || defaultPath,
     }
@@ -129,9 +141,7 @@ export const promptForMissingOptions = async (options) => {
   return {
     ...options,
     ...rest,
-    rmTemplates: templateOpts.filter(
-      (c) => c.toLowerCase() !== chosenTemplate.toLowerCase()
-    ),
+    rmTemplates: getRmTemplates(chosenTemplate),
     template: chosenTemplate,
     projectPath: projectPath || defaultPath,
     gitInit: gitInit || inqGitInit,

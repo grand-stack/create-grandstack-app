@@ -99,7 +99,7 @@ export const downloadFile = async (sourceUrl, targetFile) => {
 export const removeUnusedTemplates = async ({ newAppDir, rmTemplates }) => {
   try {
     const rimRafPromises = rmTemplates.map((choice) =>
-      rimraf(path.join(newAppDir, `web-${choice.toLowerCase()}`), (err) => {
+      rimraf(path.join(newAppDir, choice), (err) => {
         if (err) {
           console.log(`%s Rimraf Exception`, chalk.redBright.bold('ERROR'))
           console.log(`%s ${err}`, chalk.redBright.bold('ERROR'))
