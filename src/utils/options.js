@@ -1,6 +1,7 @@
 import inquirer from 'inquirer'
 import arg from 'arg'
 import chalk from 'chalk'
+import execa from 'execa'
 
 const templateOpts = ['React', 'React-TS', 'Angular', 'Flutter']
 const templateFileNameHashMap = {
@@ -18,6 +19,15 @@ const getRmTemplates = (chosenTemplate) => {
   return Object.values(templateFileNameHashMap).filter(
     (name) => name !== templateFileNameHashMap[chosenTemplate]
   )
+}
+
+const shouldUseYarn = () => {
+  try {
+    execa.sync('yarnpkg', ['--version'])
+    return true
+  } catch (e) {
+    return false
+  }
 }
 
 const APIQuestions = [
@@ -81,7 +91,7 @@ export const parseArgumentsIntoOptions = (rawArgs) => {
       projectPath: args._[0],
       template: args._[1],
       runInstall: args['--install'] || false,
-      useNpm: args['--use-npm'] || false,
+      useNpm: args['--use-npm'] || !shouldUseYarn(),
     }
   } catch (error) {
     console.log('unknown option')
