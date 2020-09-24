@@ -75,7 +75,7 @@ async function createApp(options) {
                   cwd: path.join(newAppDir, templateFileName),
                   prefer: packageManager,
                 }),
-              skip: templateFileName === 'api',
+              skip: templateFileName === 'api-only',
             },
           ]),
         skip: () =>
