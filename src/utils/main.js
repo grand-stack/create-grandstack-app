@@ -69,13 +69,16 @@ async function createApp(options) {
                 }),
             },
             {
-              title: `Installing ${templateFileName} dependencies`,
+              title:
+                templateFileName === 'api-only'
+                  ? 'Skipping Frontend Install'
+                  : `Installing ${templateFileName} dependencies`,
               task: () =>
                 projectInstall({
                   cwd: path.join(newAppDir, templateFileName),
                   prefer: packageManager,
                 }),
-              skip: templateFileName === 'api-only',
+              skip: () => templateFileName === 'api-only',
             },
           ]),
         skip: () =>
