@@ -109,10 +109,7 @@ Then (optionally) to seed the database with sample data, in the api/ directory i
 
         npm run seedDb
 
-The default application is built off the concept of a business reviews application.  A minimal yelp
-style app, with some preloaded reviews that you can search through and update.  Feel free to suggest
-updates to the initial application shell by visiting the open source template repo and opening an
-issue: https://github.com/grand-stack/grand-stack-starter/issues.
+The default application is a simple business reviews application. Feel free to suggest updates by visiting the open source template repo and opening an issue: https://github.com/grand-stack/grand-stack-starter/issues.
 `)
   return true
 }
