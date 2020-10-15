@@ -3,12 +3,13 @@ import arg from 'arg'
 import chalk from 'chalk'
 import execa from 'execa'
 
-const templateOpts = ['React', 'React-TS', 'Angular', 'Flutter']
+const templateOpts = ['React', 'React-TS', 'Angular', 'Flutter', 'API-Only']
 const templateFileNameHashMap = {
   React: 'web-react',
   'React-TS': 'web-react-ts',
   Angular: 'web-angular',
   Flutter: 'mobile_client_flutter',
+  'API-Only': 'api-only',
 }
 
 export const getTemplateFileName = (chosenTemplate) => {
@@ -17,7 +18,8 @@ export const getTemplateFileName = (chosenTemplate) => {
 
 const getRmTemplates = (chosenTemplate) => {
   return Object.values(templateFileNameHashMap).filter(
-    (name) => name !== templateFileNameHashMap[chosenTemplate]
+    (name) =>
+      name !== templateFileNameHashMap[chosenTemplate] && name !== 'api-only'
   )
 }
 

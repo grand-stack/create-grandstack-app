@@ -69,12 +69,16 @@ async function createApp(options) {
                 }),
             },
             {
-              title: `Installing ${templateFileName} dependencies`,
+              title:
+                templateFileName === 'api-only'
+                  ? 'Skipping Frontend Install'
+                  : `Installing ${templateFileName} dependencies`,
               task: () =>
                 projectInstall({
                   cwd: path.join(newAppDir, templateFileName),
                   prefer: packageManager,
                 }),
+              skip: () => templateFileName === 'api-only',
             },
           ]),
         skip: () =>
@@ -95,7 +99,8 @@ async function createApp(options) {
   )
   console.log(`You can find documentation at: https://grandstack.io/docs`)
   console.log()
-  console.log(`To start your GRANDstack web application and GraphQL API run:
+  console.log(`
+To start your GRANDstack web application and GraphQL API run:
 
         cd ${projectPath}
         npm run start
@@ -103,6 +108,11 @@ async function createApp(options) {
 Then (optionally) to seed the database with sample data, in the api/ directory in another terminal run:
 
         npm run seedDb
+
+The default application is built off the concept of a business reviews application.  A minimal yelp
+style app, with some preloaded reviews that you can search through and update.  Feel free to suggest
+updates to the initial application shell by visiting the open source template repo and opening an
+issue: https://github.com/grand-stack/grand-stack-starter/issues.
 `)
   return true
 }
