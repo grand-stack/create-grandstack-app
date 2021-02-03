@@ -38,7 +38,6 @@ export const writeDotEnv = ({
   neo4jUri,
   neo4jUser,
   neo4jPassword,
-  neo4jEncrypted,
 }) => {
   const dotenvpath = path.join(newAppDir, 'api')
 
@@ -50,9 +49,6 @@ export const writeDotEnv = ({
 NEO4J_URI=${neo4jUri}
 NEO4J_USER=${neo4jUser}
 NEO4J_PASSWORD=${neo4jPassword}
-
-# Uncomment this line to enable encrypted driver connection for Neo4j
-${neo4jEncrypted ? '' : '#'}NEO4J_ENCRYPTED=true
 
 # Uncomment this line to specify a specific Neo4j database (v4.x+ only)
 #NEO4J_DATABASE=neo4j
@@ -72,7 +68,9 @@ export const writeConfigJson = ({
   templateFileName,
 }) => {
   const configPath = path.join(newAppDir, 'scripts', 'config')
-  fs.mkdirSync(configPath)
+  if (!fs.existsSync(configPath)) {
+    fs.mkdirSync(configPath)
+  }
   const config = {
     templateFileName,
     templateName,

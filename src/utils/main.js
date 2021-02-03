@@ -14,13 +14,12 @@ async function createApp(options) {
     gitInit,
     useNpm,
     neo4jUri,
-    neo4jEncrypted,
     neo4jUser,
     neo4jPassword,
     runInstall,
   } = options
 
-  const creds = { neo4jUri, neo4jEncrypted, neo4jUser, neo4jPassword }
+  const creds = { neo4jUri, neo4jUser, neo4jPassword }
 
   // Check to see if path exists and return joined path
   const newAppDir = appDir(projectPath)

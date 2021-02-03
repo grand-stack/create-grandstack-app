@@ -45,15 +45,9 @@ Hit <Return> When you are ready.`
   {
     type: 'input',
     name: 'neo4jUri',
-    message: 'Alright, Enter the connection string for Neo4j',
+    message: `Enter the connection string for Neo4j
+    (use neo4j+s:// or bolt+s:// scheme for encryption)`,
     default: 'bolt://localhost:7687',
-  },
-  {
-    type: 'confirm',
-    name: 'neo4jEncrypted',
-    message:
-      'Use an encrypted connection for Neo4j? (Select "No" for Neo4j Sandbox)',
-    default: false,
   },
   {
     type: 'input',
@@ -110,7 +104,6 @@ export const promptForMissingOptions = async (options) => {
     return {
       ...options,
       neo4jUri: 'bolt://localhost:7687',
-      neo4jEncrypted: false,
       neo4jUser: 'neo4j',
       neo4jPassword: 'letmein',
       rmTemplates: getRmTemplates(chosenTemplate),
